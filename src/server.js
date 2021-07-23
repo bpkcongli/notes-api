@@ -7,7 +7,7 @@ const NotesValidator = require('./validator/notes/index');
 const init = async () => {
   const server = Hapi.server({
     port: process.env.SRVPORT,
-    host: (process.env.NODE_ENV !== 'production') ? process.env.SRVHOST : '0.0.0.0',
+    host: process.env.SRVHOST,
     routes: {
       cors: {
         origin: ['*'],
