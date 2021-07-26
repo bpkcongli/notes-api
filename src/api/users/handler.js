@@ -7,38 +7,30 @@ class UsersHandler {
   }
 
   async postUserHandler(request, reply) {
-    try {
-      this._validator.validateUserPayload(request.payload);
+    this._validator.validateUserPayload(request.payload);
 
-      const {username, password, fullname} = request.payload;
-      const userId = this._service.addUser({username, password, fullname});
+    const {username, password, fullname} = request.payload;
+    const userId = this._service.addUser({username, password, fullname});
 
-      return reply.response({
-        'status': 'success',
-        'message': 'User berhasil ditambahkan',
-        'data': {
-          userId,
-        },
-      }).code(201);
-    } catch (error) {
-      // TODO: error handling
-    }
+    return reply.response({
+      'status': 'success',
+      'message': 'User berhasil ditambahkan',
+      'data': {
+        userId,
+      },
+    }).code(201);
   }
 
   async getUserByIdHandler(request, reply) {
-    try {
-      const {id} = request.params;
-      const user = await this._service.getUserById(id);
+    const {id} = request.params;
+    const user = await this._service.getUserById(id);
 
-      return {
-        'status': 'success',
-        'data': {
-          user,
-        },
-      };
-    } catch (error) {
-      // TODO: error handling
-    }
+    return {
+      'status': 'success',
+      'data': {
+        user,
+      },
+    };
   }
 }
 
