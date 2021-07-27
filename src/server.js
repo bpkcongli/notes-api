@@ -1,11 +1,20 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+
 const notes = require('./api/notes/index');
 const NotesService = require('./services/postgres/NotesService');
 const NotesValidator = require('./validator/notes/index');
+
 const users = require('./api/users/index');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users/index');
+
+const authentications = require('./api/authentications/index');
+const AuthenticationsService = require('./services/postgres/AuthenticationsService');
+const AuthenticationsValidator = require('./validator/authentications/index');
+
+const TokenManager = require('./tokenize/TokenManager');
+
 const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
@@ -21,6 +30,7 @@ const init = async () => {
 
   const notesService = new NotesService();
   const usersService = new UsersService();
+  const authenticationsService = new AuthenticationsService();
 
   server.ext('onPreResponse', (request, h) => {
     const {response} = request;
@@ -53,6 +63,15 @@ const init = async () => {
       options: {
         service: usersService,
         validator: UsersValidator,
+      },
+    },
+    {
+      plugin: authentications,
+      options: {
+        authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
       },
     },
   ]);
