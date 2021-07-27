@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 
 const notes = require('./api/notes/index');
 const NotesService = require('./services/postgres/NotesService');
@@ -28,10 +29,12 @@ const init = async () => {
     },
   });
 
+  // initiate all services
   const notesService = new NotesService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
 
+  // error handling automatically run before the response is sent
   server.ext('onPreResponse', (request, h) => {
     const {response} = request;
 
@@ -50,6 +53,31 @@ const init = async () => {
     return response.continue || response;
   });
 
+  // Using external plugin (Jwt)
+  await server.register([
+    {
+      plugin: Jwt,
+    },
+  ]);
+
+  // create authentication strategy using jwt schema
+  server.auth.strategy('notesapp_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  });
+
+  // using internal plugin
   await server.register([
     {
       plugin: notes,
@@ -75,6 +103,7 @@ const init = async () => {
       },
     },
   ]);
+
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
