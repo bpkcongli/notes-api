@@ -43,11 +43,16 @@ const init = async () => {
         'status': 'fail',
         'message': response.message,
       }).code(response.statusCode);
-    } else if (response instanceof Error) {
+    } else if (response.isServer) {
       return h.response({
         'status': 'error',
         'message': 'Maaf, terjadi kegagalan pada server kami.',
       }).code(500);
+    } else if (response.isBoom) {
+      return h.response({
+        'status': 'fail',
+        'message': response.output.payload.message,
+      }).code(response.output.payload.statusCode);
     }
 
     return response.continue || response;
