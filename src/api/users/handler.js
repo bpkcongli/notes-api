@@ -3,6 +3,7 @@ class UsersHandler {
     this._service = service;
     this._validator = validator;
     this.postUserHandler = this.postUserHandler.bind(this);
+    this.getUsersByUsernameHandler = this.getUsersByUsernameHandler.bind(this);
     this.getUserByIdHandler = this.getUserByIdHandler.bind(this);
   }
 
@@ -21,7 +22,19 @@ class UsersHandler {
     }).code(201);
   }
 
-  async getUserByIdHandler(request, reply) {
+  async getUsersByUsernameHandler(request) {
+    const {username = ''} = request.query;
+    const users = await this._service.getUsersByUsername(username);
+
+    return {
+      'status': 'success',
+      'data': {
+        users,
+      },
+    };
+  }
+
+  async getUserByIdHandler(request) {
     const {id} = request.params;
     const user = await this._service.getUserById(id);
 
