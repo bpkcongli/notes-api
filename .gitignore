@@ -3,3 +3,4 @@ notes-api-webserver.pem
 notes-api-webserver.ppk
 .env
 .prod.env
+src/api/uploads/file/images
